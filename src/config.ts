@@ -1,0 +1,23 @@
+export const SITE = {
+  website: "https://ad6398.github.io/",
+  author: "Amardeep Kumar",
+  profile: "https://ad6398.github.io/",
+  desc: "ML Engineer & NLP Researcher. Building at the intersection of LLMs, research, and production AI systems.",
+  title: "Amardeep Kumar",
+  ogImage: "og.jpg",
+  lightAndDarkMode: true,
+  postPerIndex: 4,
+  postPerPage: 4,
+  scheduledPostMargin: 15 * 60 * 1000,
+  showArchives: true,
+  showBackButton: true,
+  editPost: {
+    enabled: false,
+    text: "Edit page",
+    url: "https://github.com/ad6398/ad6398.github.io/edit/main/",
+  },
+  dynamicOgImage: true,
+  dir: "ltr",
+  lang: "en",
+  timezone: "America/New_York",
+} as const;
