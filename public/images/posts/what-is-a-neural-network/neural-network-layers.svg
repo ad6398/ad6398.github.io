@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="680" height="360" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+
+  <!-- Background -->
+  <rect width="680" height="360" fill="#ffffff"/>
+
+  <!-- ── Edges (drawn first, behind nodes) ── -->
+
+  <!-- x1 → hidden -->
+  <line x1="148" y1="100" x2="312" y2="80"  stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="100" x2="312" y2="160" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="100" x2="312" y2="240" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="100" x2="312" y2="320" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- x2 → hidden -->
+  <line x1="148" y1="200" x2="312" y2="80"  stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="200" x2="312" y2="160" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="200" x2="312" y2="240" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="200" x2="312" y2="320" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- x3 → hidden -->
+  <line x1="148" y1="300" x2="312" y2="80"  stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="300" x2="312" y2="160" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="300" x2="312" y2="240" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="148" y1="300" x2="312" y2="320" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- hidden → output -->
+  <line x1="388" y1="80"  x2="532" y2="200" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="388" y1="160" x2="532" y2="200" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="388" y1="240" x2="532" y2="200" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="388" y1="320" x2="532" y2="200" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- ── Layer labels ── -->
+  <text x="120" y="32" text-anchor="middle" font-size="13" fill="#64748b" font-weight="600">Input Layer</text>
+  <text x="350" y="32" text-anchor="middle" font-size="13" fill="#64748b" font-weight="600">Hidden Layer</text>
+  <text x="580" y="32" text-anchor="middle" font-size="13" fill="#64748b" font-weight="600">Output Layer</text>
+
+  <!-- ── Input nodes ── -->
+  <circle cx="120" cy="100" r="28" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="105" text-anchor="middle" font-size="15" fill="#1e40af" font-weight="bold">x₁</text>
+
+  <circle cx="120" cy="200" r="28" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="205" text-anchor="middle" font-size="15" fill="#1e40af" font-weight="bold">x₂</text>
+
+  <circle cx="120" cy="300" r="28" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="305" text-anchor="middle" font-size="15" fill="#1e40af" font-weight="bold">x₃</text>
+
+  <!-- ── Hidden nodes ── -->
+  <circle cx="350" cy="80"  r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="350" y="85" text-anchor="middle" font-size="15" fill="#4c1d95" font-weight="bold">h₁</text>
+
+  <circle cx="350" cy="160" r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="350" y="165" text-anchor="middle" font-size="15" fill="#4c1d95" font-weight="bold">h₂</text>
+
+  <circle cx="350" cy="240" r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="350" y="245" text-anchor="middle" font-size="15" fill="#4c1d95" font-weight="bold">h₃</text>
+
+  <circle cx="350" cy="320" r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="350" y="325" text-anchor="middle" font-size="15" fill="#4c1d95" font-weight="bold">h₄</text>
+
+  <!-- ── Output node ── -->
+  <circle cx="560" cy="200" r="28" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="560" y="205" text-anchor="middle" font-size="15" fill="#14532d" font-weight="bold">ŷ</text>
+
+  <!-- ── Data flow label ── -->
+  <text x="340" y="352" text-anchor="middle" font-size="11" fill="#94a3b8">data flows left → right</text>
+
+</svg>
