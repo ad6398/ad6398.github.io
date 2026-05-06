@@ -12,43 +12,32 @@ import { SITE } from "@/config";
 
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  const otherPosts = getSortedPosts(posts).filter(
-    p => !p.data.tags.includes("genz-to-ai-enz")
-  );
-  return paginate(otherPosts, { pageSize: SITE.postPerPage });
+  return paginate(getSortedPosts(posts), { pageSize: SITE.postPerPage });
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
-
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-const seriesPosts = getSortedPosts(allPosts)
-  .filter(p => p.data.tags.includes("genz-to-ai-enz"))
-  .reverse();
 ---
 
 <Layout title={`Posts | ${SITE.title}`}>
   <Header />
   <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    {page.currentPage === 1 && seriesPosts.length > 0 && (
-      <section class="mb-8">
-        <h2 class="text-xl font-semibold mb-1 tracking-wide">GenZ to AI Enz</h2>
-        <p class="text-sm opacity-70 mb-4">A series on AI engineering for CS students and early-career engineers.</p>
-        <ul>
-          {seriesPosts.map(data => <Card {...data} variant="h3" />)}
-        </ul>
-      </section>
+    {page.currentPage === 1 && (
+      <a
+        href="/series/genz-to-ai-enz"
+        class="group mb-8 flex items-center justify-between rounded-lg border border-border bg-background px-5 py-4 transition-colors hover:border-accent"
+      >
+        <div>
+          <p class="font-semibold text-accent">GenZ to AI Enz</p>
+          <p class="mt-0.5 text-sm opacity-70">
+            A series on AI engineering for CS students and early-career engineers.
+          </p>
+        </div>
+        <span class="text-accent opacity-60 transition-opacity group-hover:opacity-100">→</span>
+      </a>
     )}
-
-    {page.data.length > 0 && (
-      <section>
-        {page.currentPage === 1 && seriesPosts.length > 0 && (
-          <h2 class="text-xl font-semibold mb-4 tracking-wide">Other Articles</h2>
-        )}
-        <ul>
-          {page.data.map(data => <Card {...data} />)}
-        </ul>
-      </section>
-    )}
+    <ul>
+      {page.data.map(data => <Card {...data} />)}
+    </ul>
   </Main>
 
   <Pagination {page} />
