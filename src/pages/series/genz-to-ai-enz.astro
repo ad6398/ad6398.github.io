@@ -1,0 +1,28 @@
+---
+import { getCollection } from "astro:content";
+import Main from "@/layouts/Main.astro";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { SITE } from "@/config";
+
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const seriesPosts = getSortedPosts(allPosts)
+  .filter(p => p.data.tags.includes("genz-to-ai-enz"))
+  .reverse();
+---
+
+<Layout title={`GenZ to AI Enz | ${SITE.title}`}>
+  <Header />
+  <Main
+    pageTitle="GenZ to AI Enz"
+    pageDesc="A series on AI engineering for CS students and early-career engineers — from the basics of deep learning to building production LLM systems."
+  >
+    <ul>
+      {seriesPosts.map(data => <Card {...data} variant="h2" />)}
+    </ul>
+  </Main>
+  <Footer />
+</Layout>

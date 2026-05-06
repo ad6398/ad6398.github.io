@@ -21,6 +21,20 @@ const { page } = Astro.props;
 <Layout title={`Posts | ${SITE.title}`}>
   <Header />
   <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
+    {page.currentPage === 1 && (
+      <a
+        href="/series/genz-to-ai-enz"
+        class="group mb-8 flex items-center justify-between rounded-lg border border-border bg-background px-5 py-4 transition-colors hover:border-accent"
+      >
+        <div>
+          <p class="font-semibold text-accent">GenZ to AI Enz</p>
+          <p class="mt-0.5 text-sm opacity-70">
+            A series on AI engineering for CS students and early-career engineers.
+          </p>
+        </div>
+        <span class="text-accent opacity-60 transition-opacity group-hover:opacity-100">→</span>
+      </a>
+    )}
     <ul>
       {page.data.map(data => <Card {...data} />)}
     </ul>

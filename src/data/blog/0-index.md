@@ -9,6 +9,7 @@ tags:
   - ml-engineering
   - llm
   - agents
+  - genz-to-ai-enz
 description: "Full table of contents for the GenZ to AI Enz series - every post and walkthrough in order."
 ---
 
