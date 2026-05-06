@@ -1,6 +1,6 @@
 ---
 title: "GenZ to AI Enz: Series Index"
-pubDatetime: 2026-05-04T00:00:00Z
+pubDatetime: 2026-05-02T00:00:00Z
 slug: genz-to-ai-enz-index
 featured: false
 draft: false
