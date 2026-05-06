@@ -9,6 +9,7 @@ tags:
   - ml-engineering
   - llm
   - agents
+  - genz-to-ai-enz
 description: "A complete series taking CS students and early-career engineers from zero ML knowledge to building real AI systems with LLMs and agents."
 ---
 

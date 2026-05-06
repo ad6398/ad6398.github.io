@@ -12,18 +12,43 @@ import { SITE } from "@/config";
 
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return paginate(getSortedPosts(posts), { pageSize: SITE.postPerPage });
+  const otherPosts = getSortedPosts(posts).filter(
+    p => !p.data.tags.includes("genz-to-ai-enz")
+  );
+  return paginate(otherPosts, { pageSize: SITE.postPerPage });
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
+
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const seriesPosts = getSortedPosts(allPosts)
+  .filter(p => p.data.tags.includes("genz-to-ai-enz"))
+  .reverse();
 ---
 
 <Layout title={`Posts | ${SITE.title}`}>
   <Header />
   <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    <ul>
-      {page.data.map(data => <Card {...data} />)}
-    </ul>
+    {page.currentPage === 1 && seriesPosts.length > 0 && (
+      <section class="mb-8">
+        <h2 class="text-xl font-semibold mb-1 tracking-wide">GenZ to AI Enz</h2>
+        <p class="text-sm opacity-70 mb-4">A series on AI engineering for CS students and early-career engineers.</p>
+        <ul>
+          {seriesPosts.map(data => <Card {...data} variant="h3" />)}
+        </ul>
+      </section>
+    )}
+
+    {page.data.length > 0 && (
+      <section>
+        {page.currentPage === 1 && seriesPosts.length > 0 && (
+          <h2 class="text-xl font-semibold mb-4 tracking-wide">Other Articles</h2>
+        )}
+        <ul>
+          {page.data.map(data => <Card {...data} />)}
+        </ul>
+      </section>
+    )}
   </Main>
 
   <Pagination {page} />
