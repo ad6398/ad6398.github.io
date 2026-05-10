@@ -29,11 +29,15 @@ The attention mechanism computes, for each position in the sequence, a weighted 
 
 Given an input matrix $X \in \mathbb{R}^{n \times d}$, we compute three projections:
 
-$$Q = XW_Q, \quad K = XW_K, \quad V = XW_V$$
+$$
+Q = XW_Q, \quad K = XW_K, \quad V = XW_V
+$$
 
 The attention output is:
 
-$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
 
 The $\sqrt{d_k}$ scaling prevents the dot products from growing large as dimension increases, which would push softmax into regions with near-zero gradients. $d_k$ is not a free parameter — it's derived as $d_k = d_{model} / h$, where $h$ is the number of attention heads. For a model with $d_{model} = 1024$ and $h = 16$, each head has $d_k = 64$. The scaling factor $\sqrt{d_k}$ therefore grows with head dimension, keeping attention scores in a reasonable range regardless of model size.
 
@@ -43,7 +47,9 @@ The result is that each output position is an average of all value vectors, weig
 
 Running a single attention operation forces the model to represent all relationships in one subspace. Multi-head attention splits the embedding dimension into $h$ heads, runs attention independently in each, and concatenates the results:
 
-$$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W_O$$
+$$
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W_O
+$$
 
 Each head learns to attend to different types of relationships — syntax, coreference, semantic similarity, positional proximity — simultaneously. A model with $d_{model}=1024$ and $h=16$ has each head operating in a 64-dimensional subspace.
 
@@ -51,7 +57,9 @@ Each head learns to attend to different types of relationships — syntax, coref
 
 The FFN is applied independently to each position after attention. It expands the representation to a larger dimension, applies a non-linearity, and projects back:
 
-$$\text{FFN}(x) = \text{activation}(xW_1 + b_1)W_2 + b_2$$
+$$
+\text{FFN}(x) = \text{activation}(xW_1 + b_1)W_2 + b_2
+$$
 
 The expansion ratio is typically 4x (so $d_{ff} = 4 \cdot d_{model}$). This is where most of the model's "knowledge storage" happens — the attention layers route and mix information, the FFN layers transform it.
 
@@ -93,7 +101,9 @@ Causal mask: each token attends only to preceding tokens
 
 A transformer's size is fully determined by four numbers: $d_{model}$ (embedding dimension), $n_{heads}$ (number of attention heads), $n_{layers}$ (number of stacked blocks), and $d_{ff}$ (FFN hidden dimension). The total parameter count is approximately:
 
-$$\text{params} \approx 12 \cdot n_{layers} \cdot d_{model}^2$$
+$$
+\text{params} \approx 12 \cdot n_{layers} \cdot d_{model}^2
+$$
 
 This formula comes from the four attention projection matrices ($4 \cdot d_{model}^2$ per layer) plus the two FFN matrices ($8 \cdot d_{model}^2$ per layer, assuming $d_{ff} = 4 \cdot d_{model}$). Two things worth noting: $d_{ff}$ directly changes the 8 coefficient — if a model uses $d_{ff} = \frac{8}{3} d_{model}$ (common with SwiGLU, to compensate for the extra gate matrix), the FFN term is closer to $\frac{16}{3} d_{model}^2$ per layer. $n_{heads}$ does not appear in the formula at all — the total Q, K, V parameter count is $3 \cdot d_{model}^2$ regardless of how many heads you split them into. More heads means smaller head dimension, not more parameters. It's a useful number to have memorized — it lets you estimate model size from architecture details and vice versa.
 
@@ -143,17 +153,23 @@ Concretely, here is what happens step by step. The query vector for a token is c
 
 The $d_k$-dimensional query vector is split into $d_k/2$ consecutive pairs: $(q_0, q_1),\ (q_2, q_3),\ \ldots,\ (q_{d_k-2}, q_{d_k-1})$. Each pair is treated as a 2D vector and rotated by an angle that depends on the token's position $m$ and a frequency $\theta_i$ assigned to that pair:
 
-$$\begin{pmatrix} q_{2i}' \\ q_{2i+1}' \end{pmatrix} = \begin{pmatrix} \cos(m\theta_i) & -\sin(m\theta_i) \\ \sin(m\theta_i) & \cos(m\theta_i) \end{pmatrix} \begin{pmatrix} q_{2i} \\ q_{2i+1} \end{pmatrix}$$
+$$
+\begin{pmatrix} q_{2i}' \\ q_{2i+1}' \end{pmatrix} = \begin{pmatrix} \cos(m\theta_i) & -\sin(m\theta_i) \\ \sin(m\theta_i) & \cos(m\theta_i) \end{pmatrix} \begin{pmatrix} q_{2i} \\ q_{2i+1} \end{pmatrix}
+$$
 
 Here $q_{2i}$ and $q_{2i+1}$ are just the $2i$-th and $(2i+1)$-th elements of the query vector — two ordinary floating-point numbers produced by the linear projection. The rotation matrix is the standard 2D rotation: it spins the vector by angle $m\theta_i$ in the plane defined by those two dimensions. The same rotation is applied to the key vector $k$ at its own position.
 
 The same process applies to every pair independently, each with its own frequency $\theta_i = 10000^{-2i/d_k}$. The exact same rotation is applied to the key vector at its position. When you then compute $q_m \cdot k_n$, the rotation matrices cancel to yield a term that depends only on $(m - n)$:
 
-$$q_m \cdot k_n = q^T R_m^T R_n k = q^T R_{n-m} k$$
+$$
+q_m \cdot k_n = q^T R_m^T R_n k = q^T R_{n-m} k
+$$
 
 where $R_a$ is the rotation matrix for offset $a$. The full attention score becomes:
 
-$$\text{score}(q_m, k_n) = \frac{q^T R_{n-m} k}{\sqrt{d_k}}$$
+$$
+\text{score}(q_m, k_n) = \frac{q^T R_{n-m} k}{\sqrt{d_k}}
+$$
 
 The model never sees absolute position — only relative distance is baked into the computation.
 
@@ -168,7 +184,9 @@ RoPE generalizes better to longer sequences than sinusoidal embeddings, and it c
 
 **ALiBi (Attention with Linear Biases)** takes the opposite philosophy: don't learn positional representations at all. Instead, subtract a linear penalty from the attention scores based on the distance between tokens:
 
-$$\text{score}(q_m, k_n) = q_m \cdot k_n - \lambda \cdot |m - n|$$
+$$
+\text{score}(q_m, k_n) = q_m \cdot k_n - \lambda \cdot |m - n|
+$$
 
 where $\lambda$ is a head-specific slope. Tokens far away get penalized more, making the model implicitly prefer attending to nearby context. ALiBi requires no position embeddings and generalizes well to lengths beyond training — the penalty simply continues growing. It was used in Bloom and MPT. It's less flexible than RoPE for tasks that require attending to distant tokens, but extremely simple to implement.
 
@@ -195,7 +213,9 @@ GQA is the standard choice in modern LLMs. LLaMA 2 70B uses 8 KV heads for 64 qu
 
 The memory reduction is straightforward to compute. With MHA, the KV cache per token is $2 \times n_{layers} \times n_{heads} \times d_{head}$ bytes (factor of 2 for K and V, $d_{head} = d_{model} / n_{heads}$). Since $n_{heads} \times d_{head} = d_{model}$, this simplifies to $2 \times n_{layers} \times d_{model}$ per token. With GQA using $n_{kv}$ KV heads, the cache becomes $2 \times n_{layers} \times n_{kv} \times d_{head}$. For LLaMA 2 70B in bfloat16 ($n_{layers}=80$, $d_{head}=128$, $n_{kv}=8$):
 
-$$\text{KV cache per token} = 2 \times 80 \times 8 \times 128 \times 2 \text{ bytes} \approx 327 \text{ KB}$$
+$$
+\text{KV cache per token} = 2 \times 80 \times 8 \times 128 \times 2 \text{ bytes} \approx 327 \text{ KB}
+$$
 
 At 8K context that's ~2.6 GB — compared to ~20 GB with MHA ($n_{heads}=64$). The 8× KV head reduction gives exactly 8× cache reduction, which directly translates to 8× more sequences you can hold in memory simultaneously (higher serving throughput).
 
@@ -208,8 +228,12 @@ Attention has quadratic memory complexity in sequence length. For a sequence of 
 
 The trick is a numerically stable online softmax algorithm. Normally, computing $\text{softmax}(x)$ requires two passes over all values: one to find the maximum (for numerical stability, to avoid overflow when exponentiating large numbers), and one to compute the normalized exponentials. Flash Attention does this in a single pass by maintaining two running statistics as it tiles through key/value blocks: a running maximum $m$ and a running normalization factor $\ell$. When a new block of attention scores arrives:
 
-$$m_{\text{new}} = \max(m_{\text{old}}, \max(\text{block}))$$
-$$\ell_{\text{new}} = \ell_{\text{old}} \cdot e^{m_{\text{old}} - m_{\text{new}}} + \sum e^{\text{block} - m_{\text{new}}}$$
+$$
+m_{\text{new}} = \max(m_{\text{old}}, \max(\text{block}))
+$$
+$$
+\ell_{\text{new}} = \ell_{\text{old}} \cdot e^{m_{\text{old}} - m_{\text{new}}} + \sum e^{\text{block} - m_{\text{new}}}
+$$
 
 The previously accumulated output is rescaled by $e^{m_{\text{old}} - m_{\text{new}}}$ to account for the updated maximum. At the end of all blocks, you have the correctly normalized softmax output without ever materializing the full $n \times n$ matrix. Each tile of Q and K fits in SRAM, computation happens there, and only the final accumulated output is written back to HBM.
 
@@ -238,7 +262,9 @@ The original transformer used **Layer Normalization**, which normalizes activati
 
 Modern LLMs use **RMSNorm (Root Mean Square Normalization)**, which drops the mean-centering step and only normalizes by the RMS of the activations:
 
-$$\text{RMSNorm}(x) = \frac{x}{\sqrt{\frac{1}{d}\sum_i x_i^2}} \cdot \gamma$$
+$$
+\text{RMSNorm}(x) = \frac{x}{\sqrt{\frac{1}{d}\sum_i x_i^2}} \cdot \gamma
+$$
 
 Why? Empirically, the mean-centering in LayerNorm contributes little to training stability while adding compute cost. RMSNorm is faster (fewer operations), and at the scale of billions of parameters, this matters. It's also more numerically stable in mixed-precision training. RMSNorm was introduced in "Root Mean Square Layer Normalization" (Zhang & Sennrich, 2019) and is now the default normalization in every major open LLM: LLaMA 1/2/3, Mistral, Falcon, Qwen, PaLM, Gemma.
 
@@ -246,7 +272,9 @@ Why? Empirically, the mean-centering in LayerNorm contributes little to training
 
 The standard FFN uses ReLU or GELU activations. Modern LLMs use **SwiGLU**, a gated linear unit variant:
 
-$$\text{SwiGLU}(x) = \text{Swish}(xW_1) \otimes (xW_2), \quad \text{Swish}(x) = x \cdot \sigma(x)$$
+$$
+\text{SwiGLU}(x) = \text{Swish}(xW_1) \otimes (xW_2), \quad \text{Swish}(x) = x \cdot \sigma(x)
+$$
 
 The intuition for why this is better than a standard activation: ReLU and GELU apply the same nonlinearity uniformly to every feature of the FFN input. SwiGLU introduces a learned gate — the $\text{Swish}(xW_1)$ term — that lets the network decide independently for each feature how much of the transformation to let through. When the gate is near 0, that feature is suppressed; when it's near 1, it passes through at full magnitude. This gives the FFN finer-grained control over which features to transform and which to ignore, which translates to better loss at the same parameter count.
 
@@ -267,11 +295,15 @@ The key insight is that a model with 8 experts of size $d_{ff}$ has 8× the para
 
 The router is a small linear layer $W_r \in \mathbb{R}^{d_{model} \times E}$, where $E$ is the number of experts. For each token representation $x$, it computes a score over all experts:
 
-$$s_i = \text{softmax}(xW_r)_i$$
+$$
+s_i = \text{softmax}(xW_r)_i
+$$
 
 The top-$k$ experts (typically $k=2$) are selected, and the token is processed independently by each. The outputs are combined as a weighted sum using the router scores:
 
-$$\text{output} = \sum_{i \in \text{top-}k} \frac{s_i}{\sum_{j \in \text{top-}k} s_j} \cdot \text{Expert}_i(x)$$
+$$
+\text{output} = \sum_{i \in \text{top-}k} \frac{s_i}{\sum_{j \in \text{top-}k} s_j} \cdot \text{Expert}_i(x)
+$$
 
 The renormalization over selected experts (not all experts) ensures the output weights sum to 1.
 
@@ -321,7 +353,9 @@ To understand context extension, you first need a concrete picture of what RoPE 
 
 Recall that RoPE splits the head dimension $d_k$ into $d_k/2$ pairs. For a head with $d_k = 64$, you get 32 pairs: $(x_0, x_1), (x_2, x_3), \ldots, (x_{62}, x_{63})$. Each pair is rotated by an angle that depends on the token's position — but crucially, each pair gets its own rotation speed, called its **rotation frequency**:
 
-$$\theta_i = 10000^{-2i/d_k}$$
+$$
+\theta_i = 10000^{-2i/d_k}
+$$
 
 Pair 0 ($i=0$) uses $\theta_0 = 10000^0 = 1.0$ radian per position. Pair 31 ($i=31$) uses $\theta_{31} = 10000^{-62/64} \approx 0.000135$ radians per position. The frequencies decrease exponentially as $i$ grows, spanning four orders of magnitude.
 
@@ -338,7 +372,9 @@ The slow pairs break. During training, pair 31 reached a maximum angle of 0.55 r
 
 **YaRN (Yet Another RoPE Extension)** fixes this by rescaling positions differently for each pair. Instead of rotating pair $i$ at position $m$ by $m \cdot \theta_i$, it rotates by $(m / s_i) \cdot \theta_i$, where $s_i$ is a per-dimension scale factor. For pair 31 with target context 128K, you want:
 
-$$(128000 / s_{31}) \times 0.000135 \leq 0.55 \implies s_{31} \geq 31.2$$
+$$
+(128000 / s_{31}) \times 0.000135 \leq 0.55 \implies s_{31} \geq 31.2
+$$
 
 For pair 0 (fast, already fine), $s_0 \approx 1$ — no scaling needed. YaRN applies aggressive scaling to the slow pairs and leaves the fast pairs alone, with a smooth interpolation in between. This keeps all dimension pairs within the angle range the model trained on, regardless of how long the context is.
 

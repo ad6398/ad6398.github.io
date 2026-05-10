@@ -78,6 +78,16 @@
       @apply border-s-accent/80 wrap-break-word opacity-80;
     }
 
+    .katex-display {
+      display: block !important;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .katex-display > .katex {
+      display: inline-block;
+    }
+
     details {
       @apply inline-block cursor-pointer text-foreground select-none [&_p]:hidden [&_ul]:my-0!;
     }
