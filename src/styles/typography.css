@@ -78,6 +78,10 @@
       @apply border-s-accent/80 wrap-break-word opacity-80;
     }
 
+    .katex {
+      @apply text-foreground;
+    }
+
     .katex-display {
       display: block !important;
       overflow-x: auto;
