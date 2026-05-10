@@ -5,8 +5,6 @@ import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import type { Root, Element } from "hast";
-import { visit } from "unist-util-visit";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -14,31 +12,6 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
-
-// Marks <p> elements that contain only a katex equation (no surrounding text)
-// so they can be centered via CSS. Runs after rehype-katex.
-function rehypeCenterMath() {
-  return (tree: Root) => {
-    visit(tree, "element", (node: Element) => {
-      if (node.tagName !== "p") return;
-      const significant = node.children.filter(
-        c => c.type !== "text" || (c.value as string).trim() !== ""
-      );
-      if (
-        significant.length === 1 &&
-        significant[0].type === "element" &&
-        (significant[0] as Element).tagName === "span" &&
-        ((significant[0] as Element).properties?.className as string[])?.includes("katex")
-      ) {
-        node.properties ??= {};
-        const cls = node.properties.className;
-        node.properties.className = Array.isArray(cls)
-          ? [...cls, "math-block"]
-          : ["math-block"];
-      }
-    });
-  };
-}
 
 // https://astro.build/config
 export default defineConfig({
@@ -50,7 +23,7 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }], remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeCenterMath],
+    rehypePlugins: [rehypeKatex],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },

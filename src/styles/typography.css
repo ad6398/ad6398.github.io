@@ -78,7 +78,6 @@
       @apply border-s-accent/80 wrap-break-word opacity-80;
     }
 
-    /* block math: $$\nmath\n$$ fenced syntax → .katex-display */
     .katex-display {
       display: block !important;
       overflow-x: auto;
@@ -87,12 +86,6 @@
 
     .katex-display > .katex {
       display: inline-block;
-    }
-
-    /* standalone equation paragraphs (added by rehypeCenterMath plugin) */
-    p.math-block {
-      text-align: center;
-      overflow-x: auto;
     }
 
     details {
