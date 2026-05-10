@@ -78,6 +78,7 @@
       @apply border-s-accent/80 wrap-break-word opacity-80;
     }
 
+    /* block math: $$\nmath\n$$ fenced syntax → .katex-display */
     .katex-display {
       display: block !important;
       overflow-x: auto;
@@ -86,6 +87,11 @@
 
     .katex-display > .katex {
       display: inline-block;
+    }
+
+    /* single-line $$math$$ → parsed as inline KaTeX in its own <p> */
+    p:has(> span.katex:only-child) {
+      text-align: center;
     }
 
     details {
