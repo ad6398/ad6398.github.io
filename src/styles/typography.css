@@ -79,8 +79,13 @@
     }
 
     .katex-display {
-      text-align: center !important;
+      display: block !important;
       overflow-x: auto;
+      text-align: center;
+    }
+
+    .katex-display > .katex {
+      display: inline-block;
     }
 
     details {
