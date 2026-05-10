@@ -89,9 +89,10 @@
       display: inline-block;
     }
 
-    /* single-line $$math$$ → parsed as inline KaTeX in its own <p> */
-    p:has(> span.katex:only-child) {
+    /* standalone equation paragraphs (added by rehypeCenterMath plugin) */
+    p.math-block {
       text-align: center;
+      overflow-x: auto;
     }
 
     details {
